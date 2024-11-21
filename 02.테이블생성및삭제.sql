@@ -16,7 +16,6 @@ CREATE TABLE IF NOT EXISTS tbl_product
 (
     prod_id   INT         NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '제품코드',
     prod_name VARCHAR(20) NULL                                COMMENT '제품이름',            -- NULL 생략가능
-    prod_name VARCHAR(20) NULL                                COMMENT '제품이름',            -- NULL 생략가능
     price     INT(5)                                          COMMENT '제품가격',            -- INT(자릿수)  
     stock     SMALLINT    DEFAULT 0                           COMMENT '제품재고'
 ) ENGINE=INNODB COMMENT '제품';
