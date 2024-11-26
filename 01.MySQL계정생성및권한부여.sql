@@ -37,10 +37,12 @@ CREATE DATABASE testdb;
 
 -- greenit 사용자에게 권한 부여하기
 -- GRANT 권한종류 PRIVILEGES ON 스키마.객체 TO '사용자'@'호스트';
+GRANT ALL PRIVILEGES ON db_company.* TO 'greenit'@'%'; -- testdb 스키마의 모든 객체 사용 권한 부여
 GRANT ALL PRIVILEGES ON testdb.* TO 'greenit'@'%'; -- testdb 스키마의 모든 객체 사용 권한 부여
 
 -- greenit 사용자의 권한 확인하기
 SHOW GRANTS FOR 'greenit'@'%';
+
 
 
 

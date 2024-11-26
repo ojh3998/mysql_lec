@@ -7,8 +7,8 @@ USE testdb;
 */
 
 -- 테이블 삭제하기(항상 삭제먼저) 
-DROP TABLE IF EXISTS tbl_order CASCADE;  -- 참조중인 테이블이 존재하면 함께 삭제 - CASCADE    
-DROP TABLE IF EXISTS tbl_product CASCADE;
+DROP TABLE IF EXISTS tbl_order;                                                                                 -- CASCADE mysql에서는 동작 하지 않음 -- 참조중인 테이블이 존재하면 함께 삭제 - CASCADE    
+DROP TABLE IF EXISTS tbl_product;
 
 -- 테이블 만들기
 
