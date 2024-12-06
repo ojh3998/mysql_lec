@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <!--
+    Contact contactBean = new Contact("010-1111-1111", "user@min.com");
+    Person personBean = new Person("유저", contactBean);
+  -->
+  
+  <!-- constructor-arg 태그 : 생성자를 이용해 값을 전달하는 태그 -->
+  
+  <bean id="contactBean" class="com.min.app01.pkg01_constructor.Contact" scope="singleton">
+    <constructor-arg>
+      <value>010-1111-1111</value>
+    </constructor-arg>
+    <constructor-arg value="user@min.com" />
+  </bean>
+  
+  <bean id="personBean" class="com.min.app01.pkg01_constructor.Person" scope="singleton">
+    <constructor-arg value="유저" />
+    <constructor-arg ref="contactBean" />
+  </bean>
+
+</beans>
