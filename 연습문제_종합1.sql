@@ -17,10 +17,11 @@ DROP TABLE IF EXISTS tbl_book;
 CREATE TABLE IF NOT EXISTS tbl_book
 (
     book_id INT NOT NULL AUTO_INCREMENT COMMENT '책번호',
-    
-
-
-
+    book_name VARCHAR(100) NULL COMMENT '책이름',
+    publisher VARCHAR(50) NULL COMMENT '출판사',
+    price INT COMMENT '가격',
+    CONSTRAINT pk_book PRIMARY KEY(book_id)
+)ENGINE=Innodb COMMENT '책';    
 
 -- 2. tbl_customer 테이블을 생성하시오.
 /*
@@ -30,7 +31,14 @@ CREATE TABLE IF NOT EXISTS tbl_book
     (3) cust_addr : 주소, 가변 길이 문자 (최대 50)
     (4) cust_tel  : 전화, 가변 길이 문자 (최대 20)
 */
-
+CREATE TABLE IF NOT EXISTS tbl_customer
+(
+    cust_id INT NOT NULL AUTO_INCREMENT COMMENT '고객번호',
+    cust_name VARCHAR(20) NULL COMMENT '고객명',
+    cust_addr VARCHAR(30) NULL COMMENT '주소',
+    cust_tel VARCHAR(20) NULL COMMENT '전화',
+    CONSTRAINT PK_customer PRIMARY KEY(cust_id)
+)ENGINE=InnoDB COMMENT '고객';    
 
 
 -- 3. tbl_order 테이블을 생성하시오.
@@ -42,6 +50,17 @@ CREATE TABLE IF NOT EXISTS tbl_book
     (4) amount     : 판매수량, 정수
     (5) ordered_at : 주문일, 날짜
 */
+CREATE TABLE IF NOT EXISTS tbl_order
+(
+    order_id INT NOT NULL AUTO_INCREMENT COMMENT '주문번호',
+    cust_id INT COMMENT '고객번호',
+    book_id INT COMMENT '책번호',
+    amount INT COMMENT '판매수량',
+    ordered_at DATE COMMENT '주문일',
+    CONSTRAINT pk_order PRIMARY KEY(order_id),
+    CONSTRAINT fk_order_cust FOREIGN KEY(cust_id) REFERENCES tbl_customer(cust_id) ON DELETE SET NULL,
+    CONSTRAINT fk_oder_book FOREIGN KEY(book_id) REFERENCES tbl_book(book_id) ON DELETE CASCADE
+)ENGINE=Innodb COMMENT '주문';
 
 
 
@@ -59,8 +78,18 @@ CREATE TABLE IF NOT EXISTS tbl_book
     9       올림픽 이야기    삼성당      7500
     10      올림픽 챔피언    나이스북    13000
 */
-
-
+INSERT INTO tbl_book(book_id, book_name, publisher, price) VALUES (NULL, '축구의 역사', '굿스포츠', 7000);
+INSERT INTO tbl_book(book_id, book_name, publisher, price) VALUES (NULL, '축구 아는 여자', '나이스북', 13000);
+INSERT INTO tbl_book(book_id, book_name, publisher, price) VALUES (NULL, '축구의 이해', '대한미디어', 22000);
+INSERT INTO tbl_book(book_id, book_name, publisher, price) VALUES (NULL, '골프 바이블', '대한미디어', 35000);
+INSERT INTO tbl_book(book_id, book_name, publisher, price) VALUES (NULL, '피겨 교본', '굿스포츠', 6000);
+INSERT INTO tbl_book(book_id, book_name, publisher, price) VALUES (NULL, '역도 단계별 기술', '굿스포츠', 6000);
+INSERT INTO tbl_book(book_id, book_name, publisher, price) VALUES  (NULL, '야구의 추억', '이상미디어', 20000);
+INSERT INTO tbl_book(book_id, book_name, publisher, price) VALUES   (NULL, '야구를 부탁해', '이상미디어', 13000);
+INSERT INTO tbl_book(book_id, book_name, publisher, price) VALUES    (NULL, '올림픽 이야기', '삼성당', 7500);
+INSERT INTO tbl_book(book_id, book_name, publisher, price) VALUES   (NULL, '올림픽 챔피언', '나이스북', 13000);
+commit;
+                  
 
 -- 5. 아래 데이터를 tbl_customer 테이블에 INSERT 하시오.
 /*
@@ -71,9 +100,14 @@ CREATE TABLE IF NOT EXISTS tbl_book
     1003     추신수   미국      333-333-3333
     1004     박세리   대한민국  NULL
 */
-
-
-
+ALTER TABLE tbl_customer AUTO_INCREMENT = 1000;
+INSERT INTO tbl_customer (cust_id, cust_name, cust_addr, cust_tel) VALUES (NULL, '박지성', '영국', '000-000-0000'),
+                                                                          (NULL, '김연아', '대한민국', '111-111-1111'),
+                                                                          (NULL, '장미란', '대한민국', '222-222-2222'),
+                                                                          (NULL, '추신수', '미국', '333-333-3333'),
+                                                                          (NULL, '박세리', '대한민국', NULL);
+                                                                          COMMIT;
+                                
 -- 6. 아래 데이터를 tbl_order 테이블에 INSERT 하시오.
 /*
     주문번호   고객번호  책번호  판매수량 주문일자
@@ -88,14 +122,34 @@ CREATE TABLE IF NOT EXISTS tbl_book
     9          1001      10      1        2020-07-09
     10         1002      6       4        2020-07-10
 */
+INSERT INTO tbl_order(order_id, cust_id, book_id, amount, ordered_at) VALUES (NULL, 1000, 1, 1, '2020-07-01'), 
+                                                                             (NULL, 1000, 3, 2, '2020-07-03'),
+                                                                             (NULL, 1001, 5, 1, '2020-07-03'),
+                                                                             (NULL, 1002, 6, 2, '2020-07-04'),
+                                                                             (NULL, 1003, 7, 3, '2020-07-05'), 
+                                                                             (NULL, 1000, 2, 5, '2020-07-07'), 
+                                                                             (NULL, 1003, 8, 2, '2020-07-07'), 
+                                                                             (NULL, 1002, 10, 2, '2020-07-08'), 
+                                                                             (NULL, 1001, 10, 1, '2020-07-09'), 
+                                                                             (NULL, 1002, 6, 4, '2020-07-10');
+                           
+                             
+COMMIT;
 
+                            
 
 -- 7. 책이름에 '올림픽'이 포함된 책 정보를 조회하시오.
-
-
+SELECT book_id, book_name, publisher, price
+  FROM tbl_book
+  WHERE book_name LIKE '올%';
 
 -- 8. 가격이 가장 비싼 책을 조회하시오.
+SELECT book_id, book_name, publisher, price
+  FROM tbl_book
+  WHERE price = (SELECT MAX(price)
+                    FROM tbl_book);
 
+ 
 
 
 -- 9. '2020-07-05'부터 '2020-07-09' 사이에 주문된 도서 정보를 조회하시오.
@@ -106,12 +160,30 @@ CREATE TABLE IF NOT EXISTS tbl_book
 -- 8        10     올림픽 챔피언
 -- 9        10     올림픽 챔피언
 
+SELECT O.order_id AS 주문번호
+     , B.book_id AS 책번호
+     , B.book_name AS 책이름
+FROM tbl_book B INNER JOIN tbl_order O
+  ON B.book_id = O.book_id
+WHERE O.ordered_at BETWEEN '2020-007-05' AND '2020-07-09'
+ORDER BY O.ordered_at ASC;
+ 
+
 
 
 -- 10. 주문한 이력이 없는 고객의 이름을 조회하시오.
 -- 고객명
 -- 박세리
+SELECT cust_name AS 고객명
+  FROM tbl_customer
+ WHERE cust_id NOT IN(SELECT cust_id
+                        FROM tbl_order);
 
+SELECT C.cust_name AS 고객명
+  FROM tbl_customer C LEFT JOIN tbl_order O
+    ON C.cust_id = O.cust_id
+ WHERE O.order_id IS NULL;
+ 
 
 
 -- 11. '2020-07-04'부터 '2020-07-07' 사이에 주문 받은 도서를 제외하고 나머지 모든 주문 정보를 조회하시오.

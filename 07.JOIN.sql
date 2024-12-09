@@ -19,34 +19,30 @@ SELECT d.dept_id, e.dept_id, dept_name, emp_id, emp_name         -- 어느테이
   반드시 올바른 조인 조건을 작성해야 함.
   
   - 테이블작성 -
-FRON "DIRVE TABLE" JOIN "DRIVEN TABLE"  --> DIRVE 테이블이 PK를 가진 놈 
+FROM "DIRVE TABLE" JOIN "DRIVEN TABLE"  --> DIRVE 테이블이 PK를 가진 놈 
 DIRVE TABLE = 조인을 주동으로하는 테이블.
 ON 절에 서도 DRIVE TABLE 의 칼럼을 먼저 작성. 
   */
   
-  -- 2. 모든 사원의 부서번호, 부서명, 사원번호, 사원명 조회하기
+  -- 2. 모든 사원의 부서번호, 부서명, 사원번호, 사원명 조회하기 
   SELECT d.dept_id, e.dept_id, dept_name, emp_id, emp_name         
-  FROM tbl_department d 
-  INNER JOIN tbl_employee e
+  FROM tbl_department d INNER JOIN tbl_employee e
   ON d.dept_id = e.dept_id;
   
   
  SELECT d.dept_id, e.dept_id, dept_name, emp_id, emp_name         -- 어느테이블의 칼럼인지 적어줘야함 - - 둘다 가지고 있기 때문
-  FROM tbl_department d  
-  JOIN tbl_employee e;           -- join 의 디폴크는 cross 4개다비교
+  FROM tbl_department d JOIN tbl_employee e;           -- join 의 디폴크는 cross 4개다비교
  
  
  -- 3. 대구에 근무하는 사원 조회하기 -- table이 두개 존재한다고 판단되면 무조건 join을 써야함
  SELECT emp_id, e.dept_id, emp_name, position, gender, hire_date, salary
- FROM tbl_department d 
- INNER JOIN tbl_employee e
+ FROM tbl_department d INNER JOIN tbl_employee e
  ON d.dept_id = e.dept_id
  WHERE location = '대구';
  
  -- 04. 지역별 근무하는 사원의 수 조회하기
  SELECT location, COUNT(*)
- FROM tbl_department d 
- INNER JOIN tbl_employee e
+ FROM tbl_department d  INNER JOIN tbl_employee e
  on d.dept_id = e.dept_id
  GROUP BY location;         -- count 함수를썼기 때문에 그뤂핑 필수!!!
  
@@ -85,5 +81,4 @@ SELECT a.category_name AS 카테고리, b.category_name AS 상위카테고리
   FROM tbl_category a INNER JOIN tbl_category b
     ON a.ref_category_code = b.category_code
  WHERE a.ref_category_code IS NOT NULL;
- 
  

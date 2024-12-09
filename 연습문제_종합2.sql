@@ -84,12 +84,18 @@ COMMIT;
 -- user_no  user_id  user_mobile1  user_mobile2
 -- 5        KJD      NULL          NULL
 -- 7        SDY      NULL          NULL
+SELECT user_no, user_id, user_mobile1, user_mobile2
+  FROM tbl_user
+ WHERE user_mobile1 IS NULL;
 
 
 
 -- 2. 연락처2가 '5'로 시작하는 사용자의 사용자번호, 아이디, 연락처1, 연락처2를 조회하시오.
 -- user_no  user_id  user_mobile1  user_mobile2
 -- 6        NHS      010           55555555
+SELECT user_no, user_id, user_mobile1, user_mobile2
+  FROM tbl_user
+ WHERE user_mobile2 LIKE '5%';
 
 
 
@@ -99,6 +105,13 @@ COMMIT;
 -- 5        KJD      2013-03-03
 -- 6        NHS      2014-04-04
 -- 10       PSH      2012-05-05
+SELECT user_no, user_id, user_regdate
+  FROM tbl_user
+ WHERE YEAR(user_regdate) >= 2010;
+
+SELECT user_no, user_id, user_regdate
+  FROM tbl_user
+ WHERE EXTRACT(YEAR FROM user_regdate) >= 2010;
 
 
 
@@ -114,6 +127,8 @@ COMMIT;
 -- 8        01066666666
 -- 9        01077777777
 -- 10       01088888888
+SELECT user_no, IFNULL(CONCAT(user_mobile1, user_mobile2), 'None') AS contact
+  FROM tbl_user;
 
 
 
@@ -124,6 +139,10 @@ COMMIT;
 -- 경남   2
 -- 충남   1
 -- 경기   2
+SELECT user_addr AS 주소
+     , COUNT(*)  AS 사용자수
+  FROM tbl_user
+ GROUP BY user_addr;
 
 
 
@@ -132,8 +151,13 @@ COMMIT;
 -- 경북   1
 -- 경남   2
 -- 충남   1
+SELECT user_addr AS 주소
+     , COUNT(*)  AS 사용자수
+  FROM tbl_user
+ WHERE user_addr NOT IN('서울', '경기')  -- WHERE user_addr != '서울' AND user_addr != '경기'
+ GROUP BY user_addr;
 
-  
+
 
 -- 7. 구매내역이 없는 사용자를 조회하시오.
 -- 번호  아이디
@@ -142,6 +166,11 @@ COMMIT;
 -- 6     HNS
 -- 7     SDY
 -- 1     YJS
+SELECT user_no AS 번호
+     , user_id AS 아이디
+  FROM tbl_user
+ WHERE user_no NOT IN(SELECT user_no
+                        FROM tbl_buy);
 
 
 
@@ -151,6 +180,11 @@ COMMIT;
 -- 의류      2
 -- 서적      2
 -- 전자      4
+SELECT P.prod_category AS 카테고리
+     , COUNT(B.buy_no) AS 구매횟수
+  FROM tbl_product P INNER JOIN tbl_buy B
+    ON P.prod_code = B.prod_code
+ GROUP BY P.prod_category;
 
 
 
@@ -161,6 +195,11 @@ COMMIT;
 -- KJD     1
 -- LHJ     2
 -- PSH     3
+SELECT U.user_id AS 아이디
+     , COUNT(B.buy_no) AS 구매횟수
+  FROM tbl_user U INNER JOIN tbl_buy B
+    ON U.user_no = B.user_no
+ GROUP BY U.user_id;
 
 
 
@@ -176,6 +215,13 @@ COMMIT;
 -- PSH     박수홍  3
 -- SDY     신동엽  0
 -- YJS     유재석  0
+SELECT U.user_id AS 아이디
+     , U.user_name AS 고객명
+     , COUNT(B.buy_no) AS 구매횟수
+  FROM tbl_user U LEFT JOIN tbl_buy B
+    ON U.user_no = B.user_no
+ GROUP BY U.user_id, U.user_name
+ ORDER BY U.user_id;
 
 
 
@@ -188,6 +234,11 @@ COMMIT;
 -- 모니터  2개
 -- 메모리  1개
 -- 벨트    0개
+SELECT P.prod_name AS 상품명
+     , CONCAT(COUNT(B.buy_no), '개') AS 판매횟수
+  FROM tbl_product P LEFT JOIN tbl_buy B
+    ON P.prod_code = B.prod_code
+ GROUP BY P.prod_code, P.prod_name;
 
 
 
@@ -197,6 +248,13 @@ COMMIT;
 -- 김용만  모니터  200
 -- 박수홍  모니터  1000
 -- 박수홍  메모리  800
+SELECT U.user_name AS 고객명
+     , P.prod_name AS 상품명
+     , P.prod_price * B.buy_amount AS 구매액
+  FROM tbl_user U INNER JOIN tbl_buy B
+    ON U.user_no = B.user_no INNER JOIN tbl_product P
+    ON P.prod_code = B.prod_code
+ WHERE P.prod_category = '전자';
 
 
 
@@ -207,6 +265,14 @@ COMMIT;
 -- PSH     박수홍  3         1860
 -- KJD     김제동  1         75
 -- LHJ     이휘재  2         80
+SELECT U.user_id AS 아이디
+     , U.user_name AS 고객명
+     , COUNT(B.buy_no) AS 구매횟수
+     , SUM(P.prod_price * B.buy_amount) AS 총구매액
+  FROM tbl_user U INNER JOIN tbl_buy B
+    ON U.user_no = B.user_no INNER JOIN tbl_product P
+    ON P.prod_code = B.prod_code
+ GROUP BY U.user_id, U.user_name;
 
 
 
@@ -215,6 +281,12 @@ COMMIT;
 -- 강호동  3
 -- 이휘재  2
 -- 박수홍  3
+SELECT U.user_name AS 고객명
+     , COUNT(B.buy_no) AS 구매횟수
+  FROM tbl_user U INNER JOIN tbl_buy B
+    ON U.user_no = B.user_no
+ GROUP BY U.user_no, U.user_name
+HAVING COUNT(B.buy_no) >= 2;
 
 
 
@@ -235,23 +307,67 @@ COMMIT;
 -- 박수홍   모니터
 -- 신동엽   NULL
 -- 유재석   NULL
+SELECT U.user_name AS 고객명
+     , P.prod_name AS 구매상품
+  FROM tbl_user U LEFT OUTER JOIN tbl_buy B
+    ON U.user_no = B.user_no LEFT OUTER JOIN tbl_product P
+    ON P.prod_code = B.prod_code
+ ORDER BY U.user_id;
 
 
 
 -- 16. 상품 테이블에서 상품명이 '책'인 상품의 카테고리를 '서적'으로 수정하시오.
+UPDATE tbl_product
+   SET prod_category = '서적'
+ WHERE prod_name = '책';
+COMMIT;
 
 
 
 -- 17. 연락처1이 '011'인 사용자의 연락처1을 모두 '010'으로 수정하시오.
+UPDATE tbl_user
+   SET user_mobile1 = '010'
+ WHERE user_mobile1 = '011';
+COMMIT;
 
 
 
 -- 18. 구매번호가 가장 큰 구매내역을 삭제하시오.
 
+-- MySQL은 UPDATE/DELETE 문에서 자기 자신의 테이블 데이터를 직접 사용할 수 없음. (Error Code: 1093.)
+DELETE
+  FROM tbl_buy
+ WHERE buy_no = (SELECT MAX(buy_no)
+                   FROM tbl_buy);
+
+-- 서브 쿼리를 하나 더 넣어서 해결해야 함.
+DELETE
+  FROM tbl_buy
+ WHERE buy_no = (SELECT a.max_buy_no
+                   FROM (SELECT MAX(buy_no) AS max_buy_no
+                           FROM tbl_buy) a);
+COMMIT;
+
 
 
 -- 19. 상품코드가 1인 상품을 삭제하시오. 삭제 이후 상품번호가 1인 상품의 구매내역이 어떻게 변하는지 조회하시오.
+-- 삭제 전 구매내역 확인해 두기
+SELECT * FROM tbl_buy;
+-- 삭제
+DELETE FROM tbl_product WHERE prod_code = 1;
+COMMIT;
+-- 삭제 후 구매내역 확인해 보기 (prod_code = 1 인 제품의 구매내역 살펴보기)
+SELECT * FROM tbl_buy;
 
 
 
 -- 20. 사용자번호가 5인 사용자를 삭제하시오. 사용자번호가 5인 사용자의 구매 내역을 먼저 삭제한 뒤 진행하시오.
+DELETE
+  FROM tbl_buy
+ WHERE user_no = 5;
+
+DELETE
+  FROM tbl_user
+ WHERE user_no = 5;
+
+COMMIT;
